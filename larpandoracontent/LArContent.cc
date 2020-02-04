@@ -26,6 +26,7 @@
 #include "larpandoracontent/LArCheating/CheatingPfoCreationAlgorithm.h"
 #include "larpandoracontent/LArCheating/CheatingCosmicRayRemovalAlgorithm.h"
 #include "larpandoracontent/LArCheating/CheatingVertexCreationAlgorithm.h"
+#include "larpandoracontent/LArCheating/CheatingVertexSelectionAlgorithm.h"
 
 #include "larpandoracontent/LArControlFlow/BdtBeamParticleIdTool.h"
 #include "larpandoracontent/LArControlFlow/BeamParticleIdTool.h"
@@ -44,11 +45,13 @@
 #include "larpandoracontent/LArHelpers/LArGeometryHelper.h"
 
 #include "larpandoracontent/LArMonitoring/CosmicRayTaggingMonitoringTool.h"
-#include "larpandoracontent/LArMonitoring/EventValidationAlgorithm.h"
+#include "larpandoracontent/LArMonitoring/NeutrinoEventValidationAlgorithm.h"
 #include "larpandoracontent/LArMonitoring/MCParticleMonitoringAlgorithm.h"
 #include "larpandoracontent/LArMonitoring/VisualMonitoringAlgorithm.h"
 #include "larpandoracontent/LArMonitoring/PfoValidationAlgorithm.h"
 #include "larpandoracontent/LArMonitoring/ShowerTensorVisualizationTool.h"
+#include "larpandoracontent/LArMonitoring/TestBeamEventValidationAlgorithm.h"
+#include "larpandoracontent/LArMonitoring/TestBeamHierarchyEventValidationAlgorithm.h"
 #include "larpandoracontent/LArMonitoring/TransverseTensorVisualizationTool.h"
 
 #include "larpandoracontent/LArPersistency/EventReadingAlgorithm.h"
@@ -177,7 +180,9 @@
 #include "larpandoracontent/LArContent.h"
 
 #define LAR_ALGORITHM_LIST(d)                                                                                                   \
-    d("LArEventValidation",                     EventValidationAlgorithm)                                                       \
+    d("LArNeutrinoEventValidation",             NeutrinoEventValidationAlgorithm)                                               \
+    d("LArTestBeamEventValidation",             TestBeamEventValidationAlgorithm)                                               \
+    d("LArTestBeamHierarchyEventValidation",    TestBeamHierarchyEventValidationAlgorithm)                                      \
     d("LArPfoValidation",                       PfoValidationAlgorithm)                                                         \
     d("LArMCParticleMonitoring",                MCParticleMonitoringAlgorithm)                                                  \
     d("LArVisualMonitoring",                    VisualMonitoringAlgorithm)                                                      \
@@ -193,6 +198,7 @@
     d("LArCheatingPfoCreation",                 CheatingPfoCreationAlgorithm)                                                   \
     d("LArCheatingCosmicRayRemoval",            CheatingCosmicRayRemovalAlgorithm)                                              \
     d("LArCheatingVertexCreation",              CheatingVertexCreationAlgorithm)                                                \
+    d("LArCheatingVertexSelection",             CheatingVertexSelectionAlgorithm)                                               \
     d("LArPcaShowerParticleBuilding",           PcaShowerParticleBuildingAlgorithm)                                             \
     d("LArMaster",                              MasterAlgorithm)                                                                \
     d("LArPostProcessing",                      PostProcessingAlgorithm)                                                        \
@@ -269,7 +275,8 @@
     d("LArBdtBeamParticleId",                   BdtBeamParticleIdTool)                                                          \
     d("LArBeamParticleId",                      BeamParticleIdTool)                                                             \
     d("LArCosmicRayTagging",                    CosmicRayTaggingTool)                                                           \
-    d("LArNeutrinoId",                          NeutrinoIdTool)                                                                 \
+    d("LArBdtNeutrinoId",                       BdtNeutrinoIdTool)                                                              \
+    d("LArSvmNeutrinoId",                       SvmNeutrinoIdTool)                                                              \
     d("LArSimpleNeutrinoId",                    SimpleNeutrinoIdTool)                                                           \
     d("LArStitchingCosmicRayMerging",           StitchingCosmicRayMergingTool)                                                  \
     d("LArCosmicRayTaggingMonitoring",          CosmicRayTaggingMonitoringTool)                                                 \

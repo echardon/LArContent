@@ -44,6 +44,7 @@ MasterAlgorithm::MasterAlgorithm() :
     m_shouldPerformSliceId(true),
     m_printOverallRecoStatus(false),
     m_visualizeOverallRecoStatus(false),
+    m_shouldRemoveOutOfTimeHits(true),
     m_pSlicingWorkerInstance(nullptr),
     m_pSliceNuWorkerInstance(nullptr),
     m_pSliceCRWorkerInstance(nullptr),
@@ -453,7 +454,7 @@ StatusCode MasterAlgorithm::RunSlicing(const VolumeIdToHitListMap &volumeIdToHit
 {
     for (const VolumeIdToHitListMap::value_type &mapEntry : volumeIdToHitListMap)
     {
-        for (const CaloHit *const pCaloHit : mapEntry.second.m_truncatedHitList)
+        for (const CaloHit *const pCaloHit : (m_shouldRemoveOutOfTimeHits ? mapEntry.second.m_truncatedHitList : mapEntry.second.m_allHitList))
         {
             if (!PandoraContentApi::IsAvailable(*this, pCaloHit))
                 continue;
@@ -909,6 +910,7 @@ const Pandora *MasterAlgorithm::CreateWorkerInstance(const LArTPC &larTPC, const
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, LArContent::RegisterBasicPlugins(*pPandora));
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::SetPseudoLayerPlugin(*pPandora, new lar_content::LArPseudoLayerPlugin));
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::SetLArTransformationPlugin(*pPandora, new lar_content::LArRotationalTransformationPlugin));
+    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RegisterCustomContent(pPandora));
     MultiPandoraApi::AddDaughterPandoraInstance(&(this->GetPandora()), pPandora);
 
     // The LArTPC
@@ -979,6 +981,7 @@ const Pandora *MasterAlgorithm::CreateWorkerInstance(const LArTPCMap &larTPCMap,
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, LArContent::RegisterBasicPlugins(*pPandora));
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::SetPseudoLayerPlugin(*pPandora, new lar_content::LArPseudoLayerPlugin));
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::SetLArTransformationPlugin(*pPandora, new lar_content::LArRotationalTransformationPlugin));
+    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RegisterCustomContent(pPandora));
     MultiPandoraApi::AddDaughterPandoraInstance(&(this->GetPandora()), pPandora);
 
     // The Parent LArTPC
@@ -1039,6 +1042,13 @@ const Pandora *MasterAlgorithm::CreateWorkerInstance(const LArTPCMap &larTPCMap,
     // Configuration
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::ReadSettings(*pPandora, settingsFile));
     return pPandora;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode MasterAlgorithm::RegisterCustomContent(const Pandora *const /*pPandora*/) const
+{
+    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -1136,6 +1146,9 @@ StatusCode MasterAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "VisualizeOverallRecoStatus", m_visualizeOverallRecoStatus));
+
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "ShouldRemoveOutOfTimeHits", m_shouldRemoveOutOfTimeHits));
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "FullWidthCRWorkerWireGaps", m_fullWidthCRWorkerWireGaps));

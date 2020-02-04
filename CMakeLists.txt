@@ -19,13 +19,9 @@ if(DEFINED ENV{CETBUILDTOOLS_VERSION})
     project(larpandoracontent)
 
     # cetbuildtools contains our cmake modules
-    SET ( CETBUILDTOOLS_VERSION $ENV{CETBUILDTOOLS_VERSION} )
-    IF (NOT CETBUILDTOOLS_VERSION)
-        MESSAGE (FATAL_ERROR "ERROR: setup cetbuildtools to get the cmake modules")
-    ENDIF()
-
-    set(CMAKE_MODULE_PATH $ENV{CETBUILDTOOLS_DIR}/Modules
-                  ${CMAKE_MODULE_PATH})
+    # Note that find package will add cetbuildtools Modules to CMAKE_MODULE_PATH
+    find_package(cetbuildtools REQUIRED)
+    ##message(STATUS "larpandoracontent: CMAKE_MODULE_PATH is ${CMAKE_MODULE_PATH}")
 
     include(CetCMakeEnv)
     cet_cmake_env()
@@ -73,7 +69,7 @@ else()
     # ATTN This package supports two build systems; please ensure version is specified here *and* in ups/product_deps
     set(${PROJECT_NAME}_VERSION_MAJOR 03)
     set(${PROJECT_NAME}_VERSION_MINOR 15)
-    set(${PROJECT_NAME}_VERSION_PATCH 00)
+    set(${PROJECT_NAME}_VERSION_PATCH 14)
     set(${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}")
 
     #-------------------------------------------------------------------------------------------------------------------------------------------
