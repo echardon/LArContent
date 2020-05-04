@@ -95,6 +95,37 @@ const LArHitWidthHelper::ClusterParameters& LArHitWidthHelper::GetClusterParamet
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+unsigned int LArHitWidthHelper::GetNProposedConstituentHits(const Cluster *const pCluster, const float maxConstituentHitWidth,
+    const float hitWidthScalingFactor)
+{
+    if (maxConstituentHitWidth < std::numeric_limits<float>::epsilon())
+    {
+        std::cout << "LArHitWidthHelper::GetConstituentHits - Negative or equivalent to zero constitent hit width not allowed" << std::endl;
+        throw StatusCodeException(STATUS_CODE_NOT_ALLOWED);
+    }
+
+    const OrderedCaloHitList &orderedCaloHitList(pCluster->GetOrderedCaloHitList());
+
+    if (orderedCaloHitList.empty())
+        throw StatusCodeException(STATUS_CODE_NOT_FOUND);
+
+    unsigned int totalConstituentHits(0);
+    for (const OrderedCaloHitList::value_type &mapEntry : orderedCaloHitList)
+    {
+        for (const CaloHit *const pCaloHit : *mapEntry.second)
+        {
+            const float hitWidth = pCaloHit->GetCellSize1() * hitWidthScalingFactor;
+            const unsigned int numberOfConstituentHits = std::ceil(hitWidth / maxConstituentHitWidth);
+
+            totalConstituentHits += numberOfConstituentHits;
+        }
+    }
+
+    return totalConstituentHits;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 LArHitWidthHelper::ConstituentHitVector LArHitWidthHelper::GetConstituentHits(const Cluster *const pCluster, const float maxConstituentHitWidth,
     const float hitWidthScalingFactor, const bool isUniform)
 {
